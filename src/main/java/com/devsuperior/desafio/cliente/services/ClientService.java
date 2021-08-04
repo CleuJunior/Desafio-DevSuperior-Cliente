@@ -13,7 +13,17 @@ public class ClientService {
     @Autowired
     private ClientRepository repository;
 
-    public List<Client> findAll() {
+    public List<Client> findAll(){
         return repository.findAll();
+    }
+
+    public Client findById(Long id){
+        try{
+            return repository.findById(id).orElseThrow();
+        } catch(Exception e)
+        {
+            return null;
+        }
+
     }
 }
