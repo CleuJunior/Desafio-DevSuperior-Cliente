@@ -4,9 +4,6 @@ import com.devsuperior.desafio.cliente.entities.Client;
 import com.devsuperior.desafio.cliente.repositories.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import javax.persistence.Column;
-import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -30,9 +27,10 @@ public class ClientService {
     }
 
     public Client insert(Client client){
-
-        return new Client();
-//        return new Client("Teste nome teste", "12345678900", 9999.89, Instant.now(), 4);
+       return repository.save(client);
 
     }
+
+
+
 }
