@@ -4,11 +4,10 @@ import com.devsuperior.desafio.cliente.entities.Client;
 import com.devsuperior.desafio.cliente.services.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -29,6 +28,14 @@ public class ClientResource {
     public ResponseEntity findById(@PathVariable Long id){
         Client client = service.findById(id);
         return ResponseEntity.ok().body(client);
+    }
+
+    @PostMapping
+    public ResponseEntity insert(@RequestBody Client client){
+        client = service.insert(client);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                .buildAndExpand(client.getId()).toUri();
+        return ResponseEntity.created(uri).body(client);
     }
 
 }
