@@ -4,6 +4,8 @@ import com.devsuperior.desafio.cliente.entities.Client;
 import com.devsuperior.desafio.cliente.repositories.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 @Service
@@ -31,6 +33,23 @@ public class ClientService {
 
     }
 
+    public Client update(Long id, Client client) {
 
+        try {
+            Client entity = repository.getOne(id);
+            entity.setName(client.getName());
+            entity.setCpf(client.getCpf());
+            entity.setIncome(client.getIncome());
+            entity.setBirthDate(client.getBirthDate());
+            entity.setChildren(client.getChildren());
+            repository.save(entity);
+            return entity;
+
+        } catch (EntityNotFoundException e){
+            throw new EntityNotFoundException();
+
+        }
+
+    }
 
 }

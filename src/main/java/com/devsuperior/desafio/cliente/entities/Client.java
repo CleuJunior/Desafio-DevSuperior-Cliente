@@ -2,6 +2,8 @@ package com.devsuperior.desafio.cliente.entities;
 
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -14,6 +16,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "tb_client")
+@JsonIgnoreProperties(value = {"handler","hibernateLazyInitializer","fieldHandler"})
 public class Client implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -44,8 +47,6 @@ public class Client implements Serializable {
     }
 
     public Long getId() { return id; }
-
-    public void setId(Long id) { this.id = id; }
 
     public String getName() { return name; }
 
