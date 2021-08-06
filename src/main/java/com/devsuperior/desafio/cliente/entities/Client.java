@@ -3,7 +3,6 @@ package com.devsuperior.desafio.cliente.entities;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;

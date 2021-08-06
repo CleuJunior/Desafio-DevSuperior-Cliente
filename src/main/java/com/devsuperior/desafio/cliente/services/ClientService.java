@@ -1,19 +1,20 @@
 package com.devsuperior.desafio.cliente.services;
 
+import com.devsuperior.desafio.cliente.dto.ClientDTO;
 import com.devsuperior.desafio.cliente.entities.Client;
 import com.devsuperior.desafio.cliente.repositories.ClientRepository;
+import com.devsuperior.desafio.cliente.services.exceptions.DatabaseException;
+import com.devsuperior.desafio.cliente.services.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-
+import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ClientService {
@@ -21,10 +22,11 @@ public class ClientService {
     @Autowired
     private ClientRepository repository;
 
-    public Page<Client> findAllPaged(PageRequest pageRequest)
+    @Transactional(readOnly = true)
+    public Page<ClientDTO> findAllPaged(PageRequest pageRequest)
     {
         Page<Client> list = repository.findAll(pageRequest);
-        return list.map(x -> new Client(x));
+        return list.map(x -> new ClientDTO(x));
 
     }
 
@@ -32,43 +34,59 @@ public class ClientService {
         return repository.findAll();
     }
 
-    public Client findById(Long id){
-        try{
-            return repository.findById(id).orElseThrow();
-        } catch(Exception e)
-        {
-            return null;
-        }
+    @Transactional(readOnly = true)
+    public ClientDTO findById(Long id){
+        Optional<Client> obj = repository.findById(id);
+        Client entity = obj.orElseThrow(() -> new ResourceNotFoundException("Entity not found"));
 
+        return new ClientDTO(entity);
     }
 
-    public Client insert(Client client){
-       return repository.save(client);
+    @Transactional
+    public ClientDTO insert(ClientDTO clientDTO){
+        Client entityClient = new Client();
+        copyDtoToEntity(clientDTO, entityClient);
+        entityClient = repository.save(entityClient);
 
+        return new ClientDTO(entityClient);
     }
 
-    public Client update(Long id, Client client) {
+    @Transactional
+    public ClientDTO update(Long id, ClientDTO clientDTO) {
 
         try {
             Client entity = repository.getOne(id);
-            entity.setName(client.getName());
-            entity.setCpf(client.getCpf());
-            entity.setIncome(client.getIncome());
-            entity.setBirthDate(client.getBirthDate());
-            entity.setChildren(client.getChildren());
-            repository.save(entity);
-            return entity;
+            copyDtoToEntity(clientDTO, entity);
+            entity = repository.save(entity);
+
+            return new ClientDTO(entity);
 
         } catch (EntityNotFoundException e){
-            throw new EntityNotFoundException();
-
+            throw new ResourceNotFoundException("Id not found " + id);
         }
 
     }
 
-
+    @Transactional
     public void delete(Long id){
-        repository.deleteById(id);
+        try {
+            repository.deleteById(id);
+        } catch (EmptyResultDataAccessException e){
+            throw new ResourceNotFoundException("Id not found " + id);
+
+        } catch(DataIntegrityViolationException e) {
+            throw new DatabaseException("Integrity violation");
+        }
 
     }
+
+    private void copyDtoToEntity(ClientDTO clientDTO, Client clientEntity) {
+        clientEntity.setName(clientDTO.getName());
+        clientEntity.setCpf(clientDTO.getCpf());
+        clientEntity.setIncome(clientDTO.getIncome());
+        clientEntity.setBirthDate(clientDTO.getBirthDate());
+        clientEntity.setChildren(clientDTO.getChildren());
+
+    }
+
 }
