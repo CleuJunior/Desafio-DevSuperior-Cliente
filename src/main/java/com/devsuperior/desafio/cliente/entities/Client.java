@@ -46,6 +46,15 @@ public class Client implements Serializable {
 
     }
 
+    public Client(Client client) {
+        this.id = client.getId();
+        this.name = client.getName();
+        this.cpf = client.getCpf();
+        this.income = client.getIncome();
+        this.birthDate = this.getBirthDate();
+        this.children = this.getChildren();
+    }
+
     public Long getId() { return id; }
 
     public String getName() { return name; }

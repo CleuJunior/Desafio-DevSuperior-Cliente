@@ -5,6 +5,8 @@ import com.devsuperior.desafio.cliente.repositories.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,6 +20,13 @@ public class ClientService {
 
     @Autowired
     private ClientRepository repository;
+
+    public Page<Client> findAllPaged(PageRequest pageRequest)
+    {
+        Page<Client> list = repository.findAll(pageRequest);
+        return list.map(x -> new Client(x));
+
+    }
 
     public List<Client> findAll(){
         return repository.findAll();

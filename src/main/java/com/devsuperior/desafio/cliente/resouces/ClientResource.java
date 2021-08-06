@@ -3,6 +3,9 @@ package com.devsuperior.desafio.cliente.resouces;
 import com.devsuperior.desafio.cliente.entities.Client;
 import com.devsuperior.desafio.cliente.services.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -17,10 +20,23 @@ public class ClientResource {
     @Autowired
     private ClientService service;
 
-    @GetMapping
-    public ResponseEntity<List<Client>> findAll(){
-        List<Client> list = service.findAll();
+//    @GetMapping
+//    public ResponseEntity<List<Client>> findAll(){
+//        List<Client> list = service.findAll();
+//
+//        return ResponseEntity.ok().body(list);
+//    }
 
+    @GetMapping
+    public ResponseEntity<Page<Client>> findAll(
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "linesPerPage", defaultValue = "12") Integer linesPerPage,
+            @RequestParam(value = "direction", defaultValue = "ASC") String direction,
+            @RequestParam(value = "orderBy", defaultValue = "name") String orderBy
+
+    ){
+        PageRequest pageRequest = PageRequest.of(page, linesPerPage, Sort.Direction.valueOf(direction), orderBy);
+        Page<Client> list = service.findAllPaged(pageRequest);
         return ResponseEntity.ok().body(list);
     }
 
